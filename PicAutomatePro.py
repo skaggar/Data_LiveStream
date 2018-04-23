@@ -11,26 +11,36 @@ num=1
 
 
 dir = '/home/sid/Documents/EP-01-07728_0016/'
+
+#Iteration to rename the file and transfer it
 for filename in sorted(os.listdir('/home/sid/Documents/EP-01-07728_0016/')):
-#while(num<100)
 	i=0
 	j=0	
 	num_str=str(num)
 	print(num_str)
+
+	# Changing the File Name
 	g=filename[:17]+num_str+'.JPG'
-	print(g)
 	print(filename)
 	g=dir+g
 	filename=dir+filename
 	os.rename(filename,g)
 	print(filename)	
-	
-	topic='topic'+num_str
+
+	# Kafka Topic Name for the image
+	topic=dir+num_str
+
+	#Opening the file
 	image=open(g,'rb')
+
+	#Fetching the size for the file
 	size=os.path.getsize(g)
 	print(size)
+
+	# Splitting the file into 1 Mb clusters
 	size10kb=size/10240
 
+	#Encode and transfer the clusters
 	while j<size10kb:
 		image.seek(i,0)
 		image_read=image.read(10240)
@@ -41,6 +51,8 @@ for filename in sorted(os.listdir('/home/sid/Documents/EP-01-07728_0016/')):
 	
 
 	num=num+1
+
+#Flush the files to Kafka Broker
 p.flush()
 
 '''image=open('EP-01-07728_0016_'+num+'.JPG','rb')
