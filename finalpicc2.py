@@ -9,15 +9,17 @@ c.subscribe(['num'])
 running = True
 num=0
 topics=[]
-number_files=239
+#number_files=239
 subdir='EP-01-07728_0016_'
 
 #clist=os.listdir('/home/skaggar/TestReceived/')
 #print (topics)
-dir= '/home/skaggar/TestReceived/'
+dir= '/home/sid/Documents/files/'
 #fh=open("NewFile1","a")
 #fh.write("hello")
-
+fh=open("/home/sid/Documents/NewFile1.txt","w")
+fh.write("")
+fh.close()
 while running:
     msg = c.poll()
     fh=open("/home/sid/Documents/NewFile1.txt","a")
@@ -31,29 +33,34 @@ while running:
         break
         #c.commit()
     fh.close()
-c.close()
 fh=open("/home/sid/Documents/NewFile1.txt","r")
 count=fh.read()
 count=int(count)
-
+c.unsubscribe()
 while (num<count):
     num=num+1
     num_str=str(num)
+    #c.subscribe([subdir+num_str])
     topics.append(subdir+num_str)
     print(num)
+    r=0
+    c.subscribe([subdir+num_str])
     while running:
+        r=r+1
         filename=dir+num_str+'.JPG'
         msg=c.poll()
         g=msg.value()
-        if(g==''):
-            break;
         image_64_decode=base64.decodestring(g)
+        if(image_64_decode==''):
+            break
         image_result=open(filename, 'ab')
-        print("Writing "+filename)
+        print("Writing")
+        print(r)
         print(num)
         #print(i)
         image_result.write(image_64_decode)
         image_result.close()
+    c.unsubscribe()
 c.close()
 
 
