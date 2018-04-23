@@ -2,16 +2,34 @@ from confluent_kafka import Producer
 import base64
 import os
 #import cv2
+
+
 p=Producer({'bootstrap.servers':'130.127.133.89:9092', 'queue.buffering.max.messages':1000000, 'batch.num.messages':50})
+p1=Producer({'bootstrap.servers':'130.127.133.89:9092', 'queue.buffering.max.messages':1000000, 'batch.num.messages':50})
+
+
 #p = Producer({'bootstrap.servers': 'node0087:9092'})
 list=os.listdir('/home/sid/Documents/EP-01-07728_0016/')
 number_files=len(list)
 print(number_files)
 num=1
+number_files_str=str(number_files)
+
+
+#Writing number of files into a Text file
+f=open("/home/sid/Documents/kafka_files/file_count.txt","w+")
+f.write(number_files_str)
+f.close()
+f1=open("/home/sid/Documents/kafka_files/file_count.txt", "r")
+for data in f1.read():
+    p1.produce('num', data.encode('utf-8'))
+p1.flush()
+
+
 
 
 dir = '/home/sid/Documents/EP-01-07728_0016/'
-
+subdir='EP-01-07728_0016_'
 #Iteration to rename the file and transfer it
 for filename in sorted(os.listdir('/home/sid/Documents/EP-01-07728_0016/')):
 	i=0
@@ -28,7 +46,7 @@ for filename in sorted(os.listdir('/home/sid/Documents/EP-01-07728_0016/')):
 	print(filename)	
 
 	# Kafka Topic Name for the image
-	topic=dir+num_str
+	topic=subdir+num_str
 
 	#Opening the file
 	image=open(g,'rb')
@@ -54,6 +72,11 @@ for filename in sorted(os.listdir('/home/sid/Documents/EP-01-07728_0016/')):
 
 #Flush the files to Kafka Broker
 p.flush()
+
+
+
+
+
 
 '''image=open('EP-01-07728_0016_'+num+'.JPG','rb')
 #success, image=f.read()
