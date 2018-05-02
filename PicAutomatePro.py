@@ -3,9 +3,8 @@ import base64
 import os
 #import cv2
 
-
-p=Producer({'bootstrap.servers':'130.127.133.89:9092', 'queue.buffering.max.messages':1000000, 'batch.num.messages':50})
-p1=Producer({'bootstrap.servers':'130.127.133.89:9092', 'queue.buffering.max.messages':1000000, 'batch.num.messages':50})
+p=Producer({'bootstrap.servers':'130.127.133.133:9092', 'queue.buffering.max.messages':1000000, 'batch.num.messages':50})
+p1=Producer({'bootstrap.servers':'130.127.133.133:9092', 'queue.buffering.max.messages':1000000, 'batch.num.messages':50})
 
 
 #p = Producer({'bootstrap.servers': 'node0087:9092'})
@@ -25,9 +24,6 @@ for data in f1.read():
     p1.produce('num', data.encode('utf-8'))
 p1.flush()
 
-
-
-
 dir = '/home/sid/Documents/EP-01-07728_0016/'
 subdir='EP-01-07728_0016_'
 #Iteration to rename the file and transfer it
@@ -43,11 +39,12 @@ for filename in sorted(os.listdir('/home/sid/Documents/EP-01-07728_0016/')):
 	g=dir+g
 	filename=dir+filename
 	os.rename(filename,g)
-	print(filename)	
+	print(g)	
 
 	# Kafka Topic Name for the image
-	topic=subdir+num_str
-
+	topic=subdir+'00'+num_str
+	#topic=subdir
+	
 	#Opening the file
 	image=open(g,'rb')
 
@@ -66,8 +63,6 @@ for filename in sorted(os.listdir('/home/sid/Documents/EP-01-07728_0016/')):
 		p.produce(topic, image_64_encode)
 		i+=10240
 		j+=1
-	
-
 	num=num+1
 
 #Flush the files to Kafka Broker

@@ -2,64 +2,72 @@ from confluent_kafka import Consumer, KafkaError
 import base64
 import os
 import time
+import sys
 
-c = Consumer({'bootstrap.servers': '130.127.133.89:9092', 'group.id': 'mygroup',
+c = Consumer({'bootstrap.servers': '130.127.133.133:9092', 'group.id': 'mygroup',
               'default.topic.config': {'auto.offset.reset': 'smallest'}, 'fetch.message.max.bytes':150000000})
 c.subscribe(['num'])
+#d = Consumer({'bootstrap.servers': '130.127.133.133:9092', 'group.id': 'mygroup',
+#             'default.topic.config': {'auto.offset.reset': 'smallest'}, 'fetch.message.max.bytes':150000000})
+#d.subscribe(['num'])
+
 running = True
 num=0
 topics=[]
 #number_files=239
 subdir='EP-01-07728_0016_'
 
-#clist=os.listdir('/home/skaggar/TestReceived/')
-#print (topics)
 dir= '/home/sid/Documents/files/'
-#fh=open("NewFile1","a")
-#fh.write("hello")
+
 fh=open("/home/sid/Documents/NewFile1.txt","w")
 fh.write("")
 fh.close()
+print("Running now")
 while running:
     msg = c.poll()
-    fh=open("/home/sid/Documents/NewFile1.txt","a")
     g=msg.value().decode('utf-8')
+    fh=open("/home/sid/Documents/NewFile1.txt","a")
     fh.write(g)
+    if(g==''):
+        break
     #timer=time.time()+2
     print('Received message: %s' % g)
     #print(time.time())
     #print(timer)
-    if(g==''):
-        break
+    
         #c.commit()
     fh.close()
 fh=open("/home/sid/Documents/NewFile1.txt","r")
 count=fh.read()
 count=int(count)
+print(count)
 c.unsubscribe()
 while (num<count):
     num=num+1
     num_str=str(num)
-    #c.subscribe([subdir+num_str])
-    topics.append(subdir+num_str)
+    c.subscribe([subdir+'00'+num_str])
+    #topics.append(subdir+num_str)
     print(num)
+    print(running)
     r=0
-    c.subscribe([subdir+num_str])
+    #d.subscribe([subdir])
     while running:
         r=r+1
         filename=dir+num_str+'.JPG'
         msg=c.poll()
         g=msg.value()
         image_64_decode=base64.decodestring(g)
-        if(image_64_decode==''):
+        if(image_64_decode==b''):
             break
         image_result=open(filename, 'ab')
         print("Writing")
-        print(r)
         print(num)
-        #print(i)
+        print(r)
         image_result.write(image_64_decode)
         image_result.close()
+#        sys.stderr.write('%% %s [%d] reached end at offset %d\n'%
+#            (msg.topic(),msg.partition(), msg.offset(), str(msg.key())))
+        print(image_64_decode)
     c.unsubscribe()
 c.close()
 
