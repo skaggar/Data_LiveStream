@@ -4,9 +4,9 @@ import os
 import time
 import sys
 
-c = Consumer({'bootstrap.servers': '130.127.133.133:9092', 'group.id': 'mygroup',
+c = Consumer({'bootstrap.servers': '130.127.55.239:9092', 'group.id': 'mygroup',
               'default.topic.config': {'auto.offset.reset': 'smallest'}, 'fetch.message.max.bytes':150000000})
-c.subscribe(['num'])
+c.subscribe(['meta'])
 #d = Consumer({'bootstrap.servers': '130.127.133.133:9092', 'group.id': 'mygroup',
 #             'default.topic.config': {'auto.offset.reset': 'smallest'}, 'fetch.message.max.bytes':150000000})
 #d.subscribe(['num'])
@@ -37,15 +37,19 @@ while running:
     
         #c.commit()
     fh.close()
+
+
+
 fh=open("/home/sid/Documents/NewFile1.txt","r")
 count=fh.read()
-count=int(count)
+count=239
+
 print(count)
 c.unsubscribe()
 while (num<count):
     num=num+1
     num_str=str(num)
-    c.subscribe([subdir+'00'+num_str])
+    c.subscribe([subdir+'0000'+num_str])
     #topics.append(subdir+num_str)
     print(num)
     print(running)

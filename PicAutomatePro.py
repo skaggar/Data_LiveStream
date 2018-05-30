@@ -1,12 +1,13 @@
 from confluent_kafka import Producer
 import base64
 import os
+import shutil
 #import cv2
 
-p=Producer({'bootstrap.servers':'130.127.133.133:9092', 'queue.buffering.max.messages':1000000, 'batch.num.messages':50})
-p1=Producer({'bootstrap.servers':'130.127.133.133:9092', 'queue.buffering.max.messages':1000000, 'batch.num.messages':50})
+p=Producer({'bootstrap.servers':'130.127.55.239:9092', 'queue.buffering.max.messages':1000000, 'batch.num.messages':50})
+#p1=Producer({'bootstrap.servers':'130.127.55.239:9092', 'queue.buffering.max.messages':1000000, 'batch.num.messages':50})
 
-
+dir = '/home/sid/Documents/EP-01-07728_0016/'
 #p = Producer({'bootstrap.servers': 'node0087:9092'})
 list=os.listdir('/home/sid/Documents/EP-01-07728_0016/')
 number_files=len(list)
@@ -15,16 +16,32 @@ num=1
 number_files_str=str(number_files)
 
 
-#Writing number of files into a Text file
-f=open("/home/sid/Documents/kafka_files/file_count.txt","w+")
-f.write(number_files_str)
-f.close()
-f1=open("/home/sid/Documents/kafka_files/file_count.txt", "r")
-for data in f1.read():
-    p1.produce('num', data.encode('utf-8'))
-p1.flush()
+#Writing number of files, the folder name and name of the files into a Text file
 
-dir = '/home/sid/Documents/EP-01-07728_0016/'
+f=open("/home/sid/Documents/kafka_files/file_meta.txt","w")
+f.close()
+f=open("/home/sid/Documents/kafka_files/file_meta.txt","a")
+f.write(number_files_str)
+f.write("\n")
+
+
+'''
+f.write("EP-01-07728_0016\n")
+for files in sorted(os.listdir(dir)):
+	f.write(files)
+	f.write("\n")
+f.close()
+'''
+
+
+f1=open("/home/sid/Documents/kafka_files/file_meta.txt", "r")
+for data in f1.read():
+	p.produce('meta', data.encode('utf-8'))
+p.flush()
+
+
+#shutil.copytree('/home/sid/Documents/EP-01-07728_0016/','/home/sid/Documents/EP-01-07728_0017/')
+
 subdir='EP-01-07728_0016_'
 #Iteration to rename the file and transfer it
 for filename in sorted(os.listdir('/home/sid/Documents/EP-01-07728_0016/')):
@@ -42,7 +59,7 @@ for filename in sorted(os.listdir('/home/sid/Documents/EP-01-07728_0016/')):
 	print(g)	
 
 	# Kafka Topic Name for the image
-	topic=subdir+'00'+num_str
+	topic=subdir+'0000'+num_str
 	#topic=subdir
 	
 	#Opening the file
@@ -66,14 +83,16 @@ for filename in sorted(os.listdir('/home/sid/Documents/EP-01-07728_0016/')):
 	num=num+1
 
 #Flush the files to Kafka Broker
-p.flush()
+	p.flush()
 
 
 
 
 
 
-'''image=open('EP-01-07728_0016_'+num+'.JPG','rb')
+
+'''
+image=open('EP-01-07728_0016_'+num+'.JPG','rb')
 #success, image=f.read()
 #print(success)
 topic='topic'+num
